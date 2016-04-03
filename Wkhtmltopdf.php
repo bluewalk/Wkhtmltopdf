@@ -56,6 +56,7 @@ class Wkhtmltopdf
     const MODE_STRING = 1;
     const MODE_EMBEDDED = 2;
     const MODE_SAVE = 3;
+    const MODE_BASE64 = 4;
 
     /**
      * @author aur1mas <aur1mas@devnet.lt>
@@ -119,7 +120,7 @@ class Wkhtmltopdf
         {
             throw new Exception("Path to directory where to store files is not writable");
         }
-        
+
         $this->setPath($options['path']);
 
         $this->_createFile();
@@ -780,7 +781,7 @@ class Wkhtmltopdf
      * @param int $mode
      * @param string $filename
      */
-    public function output($mode, $filename)
+    public function output($mode, $filename = 'temp.pdf')
     {
         switch ($mode) {
             case self::MODE_DOWNLOAD:
@@ -810,6 +811,8 @@ class Wkhtmltopdf
             case self::MODE_STRING:
                 return $this->_render();
                 break;
+            case self::MODE_BASE64:
+                return base64_encode($this->_render());
             case self::MODE_EMBEDDED:
                 if (!headers_sent()) {
                     $result = $this->_render();
