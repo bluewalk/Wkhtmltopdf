@@ -771,6 +771,11 @@ class Wkhtmltopdf
             throw new Exception("Shell error, return code: " . (int)$content['return']);
         }
 
+        // Clean up temp files
+        $filepath = $this->getFilePath();
+        if (!empty($filepath))
+            unlink($filepath);
+
         return $content['stdout'];
     }
 
@@ -800,9 +805,6 @@ class Wkhtmltopdf
                     header("Content-Transfer-Encoding: binary");
                     header("Content-Length: " . strlen($result));
                     echo $result;
-                    $filepath = $this->getFilePath();
-                    if (!empty($filepath))
-                        unlink($filepath);
                     exit();
                 } else {
                     throw new Exception("Headers already sent");
@@ -824,10 +826,6 @@ class Wkhtmltopdf
                     header("Content-Length: " . strlen($result));
                     header('Content-Disposition: inline; filename="' . basename($filename) .'";');
                     echo $result;
-                    $filepath = $this->getFilePath();
-                    if (!empty($filepath)) {
-                        unlink($filepath);
-                    }
                     exit();
                 } else {
                     throw new Exception("Headers already sent");
@@ -835,10 +833,6 @@ class Wkhtmltopdf
                 break;
             case self::MODE_SAVE:
                 file_put_contents($this->getPath() . $filename, $this->_render());
-                $filepath = $this->getFilePath();
-                if (!empty($filepath)) {
-                    unlink($filepath);
-                }
                 break;
             default:
                 throw new Exception("Mode: " . $mode . " is not supported");
